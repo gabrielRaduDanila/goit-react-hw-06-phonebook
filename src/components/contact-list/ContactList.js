@@ -1,4 +1,6 @@
+import { useDispatch, useSelector } from 'react-redux';
 import './ContactList.css';
+import { openModal, setId, setName } from 'features/modal/modalSlice';
 
 const findFilteredContacts = (contacts, filter) => {
   const typedName = filter.toLowerCase();
@@ -8,47 +10,34 @@ const findFilteredContacts = (contacts, filter) => {
   return filterdContact;
 };
 
-const ContactList = ({ filter, contacts, setContacts }) => {
+const ContactList = () => {
+  const { filter, contacts } = useSelector(state => state.phonebook);
+  const dispatch = useDispatch();
+
   const contactsToDisplay = filter
     ? findFilteredContacts(contacts, filter)
     : contacts;
-  function handleClick(e) {
-    if (filter) {
-      const otherContact = contacts.filter(
-        contact => !contactsToDisplay.some(cont => contact.id === cont.id)
-      );
-      const clickedBtn = e.target;
-      const id = clickedBtn.id;
-      const newContacts = contactsToDisplay.filter(
-        contact => contact.id !== id
-      );
-      const toSetContacts = [...otherContact, ...newContacts];
-      setContacts(toSetContacts);
-      return;
-    }
-
-    const clickedBtn = e.target;
-    const id = clickedBtn.id;
-    const newContacts = contacts.filter(contact => contact.id !== id);
-    setContacts(newContacts);
-  }
 
   return (
     <div>
       <h2>Contacts</h2>
       <ul className="contacts-list">
         {contactsToDisplay.map(contact => {
+          const contactId = contact.id;
           return (
-            <li key={contact.id}>
+            <li key={contactId}>
               <p>
                 <span>{capitalizeName(contact.name)}: </span>
                 {contact.number}
               </p>
               <button
                 type="button"
-                id={contact.id}
                 className="remove-button"
-                onClick={handleClick}
+                onClick={() => {
+                  dispatch(setId({ id: contactId }));
+                  dispatch(setName({ name: contact.name }));
+                  dispatch(openModal());
+                }}
               >
                 Delete
               </button>

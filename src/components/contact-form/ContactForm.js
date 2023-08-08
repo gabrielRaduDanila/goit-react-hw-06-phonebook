@@ -1,8 +1,11 @@
-import { nanoid } from 'nanoid';
 import './ContactForm.css';
 import { useRef } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+import { addContact } from 'features/phonebook/phonebookSlice';
 
-const ContactForm = ({ contacts, setContacts }) => {
+const ContactForm = () => {
+  const { contacts } = useSelector(state => state.phonebook);
+  const dispatch = useDispatch();
   const nameInput = useRef();
   const numberInput = useRef();
 
@@ -30,14 +33,7 @@ const ContactForm = ({ contacts, setContacts }) => {
       alert(`${matchPerson.name} is already in contacts`);
       return;
     }
-
-    const person = {
-      id: nanoid(5),
-      name: name,
-      number: number,
-    };
-    const newContacts = [...contacts, person];
-    setContacts(newContacts);
+    dispatch(addContact({ name, number }));
     e.target.reset();
   };
 
